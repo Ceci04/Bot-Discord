@@ -107,7 +107,7 @@ function play(guild, cancion) {
     const transmision = colaServidor.conexion
         .play(ytdl(cancion.url))
         .on('finish', () => {
-            colaServidor.cancion.shift();
+            colaServidor.canciones.shift();
             play(guild, colaServidor.canciones[0]);
         })
         .on('error', err => console.error(err));
@@ -126,7 +126,7 @@ function skip(msg, colaServidor) {
     if (!colaServidor) {
         return msg.channel.send('**¡No hay canciones que se puedan saltar!**');
     }
-    colaServidor.conexion.transmision.end();
+    colaServidor.conexion.player.dispatcher.end();
 }
 
 // Funcion parar
@@ -140,7 +140,7 @@ function stop(msg, colaServidor) {
         return msg.channel.send('**¡No hay canciones que se puedan parar!**');
     }
     colaServidor.canciones = [];
-    colaServidor.conexion.transmision.end();
+    colaServidor.conexion.player.dispatcher.end();
 }
 
 cliente.login(token);
