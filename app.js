@@ -6,7 +6,7 @@ const ytdl = require('ytdl-core');
 const {
     prefijo,
     token,
-} = require('./config/config.json');
+} = require('./config.json');
 
 const cola = new Map();
 
