@@ -8,7 +8,14 @@ const {
     token,
 } = require('./config.json');
 
-const listaCanciones = ["https://www.youtube.com/watch?v=sDtUXRdFkaw", "https://www.youtube.com/watch?v=rUAAAU9Yp3g", "https://www.youtube.com/watch?v=999tf5-ONGw&ab_channel=GANGSTERCITY"];
+const listaCanciones = [
+    "https://www.youtube.com/watch?v=sDtUXRdFkaw",
+    "https://www.youtube.com/watch?v=rUAAAU9Yp3g",
+    "https://www.youtube.com/watch?v=tDZDi74Mf80",
+    "https://www.youtube.com/watch?v=s3FDqC1EnZ8",
+    "https://www.youtube.com/watch?v=Ht0FRi-8N54",
+    "https://www.youtube.com/watch?v=PWDsO1iywXY"
+];
 
 const ayuda = "``` Comandos 📋\n !play: (URL Youtube) - Nos permite colocar una canción en la cola.\n !skip: - Nos permite saltar la canción actual.\n !stop: - Nos permite parar el bot.\n !rand: - Nos pondrá una de las canciones que se encuentren en la lista.\n !addList: (En desarrollo) - Nos permite añadir una canción a la lista de canciones.```";
 
