@@ -8,6 +8,10 @@ const {
     token,
 } = require('./config.json');
 
+const listaCanciones = ["https://www.youtube.com/watch?v=sDtUXRdFkaw", "https://www.youtube.com/watch?v=rUAAAU9Yp3g", "https://www.youtube.com/watch?v=999tf5-ONGw&ab_channel=GANGSTERCITY"];
+
+const ayuda = "``` Comandos 📋\n !play: (URL Youtube) - Nos permite colocar una canción en la cola.\n !skip: - Nos permite saltar la canción actual.\n !stop: - Nos permite parar el bot.\n !rand: - Nos pondrá una de las canciones que se encuentren en la lista.\n !addList: (En desarrollo) - Nos permite añadir una canción a la lista de canciones.```";
+
 const cola = new Map();
 
 // Estados del bot
@@ -26,22 +30,40 @@ cliente.on('message', async (msg) => {
     const colaServidor = cola.get(msg.guild.id);
     // Check: Si el mensaje contiene el prefijo
     if (contenido.startsWith(`${prefijo}play`)) {
-        ejecutar(msg, colaServidor);
-        return;
+        // Check: Si han indicado la url del video
+        if (!contenido.includes("http")) {
+            msg.channel.send('**Es necesario que introduzcas la URL del video.**');
+        } else {
+            ejecutar(msg, colaServidor);
+            return;
+        }
     } else if (contenido.startsWith(`${prefijo}skip`)) {
         skip(msg, colaServidor);
         return;
     } else if (contenido.startsWith(`${prefijo}stop`)) {
         stop(msg, colaServidor);
         return;
+    } else if (contenido.startsWith(`${prefijo}rand`)) {
+        ejecutar(msg, colaServidor, listaCanciones);
+        return;
+    } else if (contenido.startsWith(`${prefijo}help`)) {
+        msg.channel.send(ayuda);
+        return;
     } else {
-        msg.channel.send('**El comando que has introducido no es válido.**');
+        msg.channel.send('**El comando que has introducido no es válido.\nPara saber que comandos hay pon !help.**');
     }
 });
 
 // Funcion que ejecutara las canciones
-async function ejecutar(msg, colaServidor) {
-    const args = msg.content.split(" ");
+async function ejecutar(msg, colaServidor, listaCanciones) {
+    let args = null;
+    if (listaCanciones) {
+        let n = Math.floor(Math.random() * listaCanciones.length);
+        let cancion = `!play ${listaCanciones[n]}`;
+        args = cancion.split(" ");
+    } else {
+        args = msg.content.split(" ");
+    }
     // Check: Si el usuario que ha invocado el bot se encuentra en un canal de voz
     const canalVoz = msg.member.voice.channel;
     if (!canalVoz) {

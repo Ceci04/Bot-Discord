@@ -1,7 +1,7 @@
 {
-    "name": "djrng",
-    "version": "1.0.0",
-    "description": "Bot DJ guiado por el RNG",
+    "name": "nanna",
+    "version": "1.0.1",
+    "description": "Nanna Bot",
     "main": "app.js",
     "author": "Adrian Cecilia (TheCeci)",
     "dependencies": {
