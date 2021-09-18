@@ -1,0 +1,22 @@
+{
+    "generos" : [
+        "pop", 
+        "rock"
+    ],
+    "playlist": [
+        {
+            "pop" : [
+                {
+                    "url" : "https://www.youtube.com/watch?v=sDtUXRdFkaw",
+                    "tag": "summer"
+                }
+            ],
+            "rock" : [
+                {
+                    "url" : "https://www.youtube.com/watch?v=rUAAAU9Yp3g",
+                    "tag": "thecab"
+                }
+            ]
+        }
+    ]
+}

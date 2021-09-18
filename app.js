@@ -6,18 +6,14 @@ const ytdl = require('ytdl-core');
 const {
     prefijo,
     token,
+    whiteList
 } = require('./config.json');
 
-const listaCanciones = [
-    "https://www.youtube.com/watch?v=sDtUXRdFkaw",
-    "https://www.youtube.com/watch?v=rUAAAU9Yp3g",
-    "https://www.youtube.com/watch?v=tDZDi74Mf80",
-    "https://www.youtube.com/watch?v=s3FDqC1EnZ8",
-    "https://www.youtube.com/watch?v=Ht0FRi-8N54",
-    "https://www.youtube.com/watch?v=PWDsO1iywXY"
-];
+// Playlist de canciones
+const listaCanciones = require('./playlist.json').playlist;
+const generos = require('./playlist.json').generos;
 
-const ayuda = "``` Comandos 📋\n !play: (URL Youtube) - Nos permite colocar una canción en la cola.\n !skip: - Nos permite saltar la canción actual.\n !stop: - Nos permite parar el bot.\n !rand: - Nos pondrá una de las canciones que se encuentren en la lista.\n !addList: (En desarrollo) - Nos permite añadir una canción a la lista de canciones.```";
+const ayuda = "``` Comandos 📋\n !play: (URL Youtube) - Nos permite colocar una canción en la cola.\n !skip: - Nos permite saltar la canción actual.\n !stop: - Nos permite parar el bot.\n !rand: - Nos pondrá una de las canciones que se encuentren en la lista.\n !cola: - Nos permite visualizar los diferentes títulos de las canciones que se encuentran en la cola.\n !addList: (En desarrollo) - Nos permite añadir una canción a la lista de canciones.```";
 
 const cola = new Map();
 
@@ -33,31 +29,39 @@ cliente.on('message', async (msg) => {
     // Check: Si el mensaje no contiene el prefijo
     let contenido = msg.content;
     if (!contenido.startsWith(prefijo)) return;
+    //Check: Si el autor del comando esta en la whiteList
+    if (whiteList.includes(msg.author.discriminator)) {
 
-    const colaServidor = cola.get(msg.guild.id);
-    // Check: Si el mensaje contiene el prefijo
-    if (contenido.startsWith(`${prefijo}play`)) {
-        // Check: Si han indicado la url del video
-        if (!contenido.includes("http")) {
-            msg.channel.send('**Es necesario que introduzcas la URL del video.**');
-        } else {
-            ejecutar(msg, colaServidor);
+        const colaServidor = cola.get(msg.guild.id);
+        // Check: Si el mensaje contiene el prefijo
+        if (contenido.startsWith(`${prefijo}play`)) {
+            // Check: Si han indicado la url del video
+            if (!contenido.includes("http")) {
+                msg.channel.send('**Es necesario que introduzcas la URL del video.**');
+            } else {
+                ejecutar(msg, colaServidor);
+                return;
+            }
+        } else if (contenido.startsWith(`${prefijo}skip`)) {
+            skip(msg, colaServidor);
             return;
+        } else if (contenido.startsWith(`${prefijo}stop`)) {
+            stop(msg, colaServidor);
+            return;
+        } else if (contenido.startsWith(`${prefijo}rand`)) {
+            ejecutar(msg, colaServidor, listaCanciones);
+            return;
+        } else if (contenido.startsWith(`${prefijo}cola`)) {
+            verCola(msg, colaServidor);
+            return;
+        } else if (contenido.startsWith(`${prefijo}help`)) {
+            msg.channel.send(ayuda);
+            return;
+        } else {
+            msg.channel.send('**El comando que has introducido no es válido.\nPara saber que comandos hay pon !help.**');
         }
-    } else if (contenido.startsWith(`${prefijo}skip`)) {
-        skip(msg, colaServidor);
-        return;
-    } else if (contenido.startsWith(`${prefijo}stop`)) {
-        stop(msg, colaServidor);
-        return;
-    } else if (contenido.startsWith(`${prefijo}rand`)) {
-        ejecutar(msg, colaServidor, listaCanciones);
-        return;
-    } else if (contenido.startsWith(`${prefijo}help`)) {
-        msg.channel.send(ayuda);
-        return;
     } else {
-        msg.channel.send('**El comando que has introducido no es válido.\nPara saber que comandos hay pon !help.**');
+        msg.channel.send('**Este usuario no cuenta con los permisos necesarios! (Pleb ✊🍆💦)**');
     }
 });
 
@@ -65,8 +69,24 @@ cliente.on('message', async (msg) => {
 async function ejecutar(msg, colaServidor, listaCanciones) {
     let args = null;
     if (listaCanciones) {
-        let n = Math.floor(Math.random() * listaCanciones.length);
-        let cancion = `!play ${listaCanciones[n]}`;
+        let genero = msg.content.split(" ")[1];
+        let n = 0;
+        let cancion = "";
+
+        if (genero == undefined) {
+            genero = generos[Math.floor(Math.random() * generos.length)];
+        }
+
+        switch (genero) {
+            case "pop":
+                n = Math.floor(Math.random() * listaCanciones.length);
+                cancion = `!play ${listaCanciones[0].pop[n].url}`;
+                break;
+            case "rock":
+                n = Math.floor(Math.random() * listaCanciones.length);
+                cancion = `!play ${listaCanciones[0].rock[n].url}`;
+                break;
+        }
         args = cancion.split(" ");
     } else {
         args = msg.content.split(" ");
@@ -93,8 +113,8 @@ async function ejecutar(msg, colaServidor, listaCanciones) {
 
     } else {
         colaServidor.canciones.push(cancion);
-        console.log(colaServidor.canciones);
-        return msg.channel.send(`${cancion.titulo} se ha añadido a la cola!`);
+        console.log("Cola actual: " + colaServidor.canciones);
+        return msg.channel.send(`**${cancion.titulo}** se ha añadido a la cola!`);
     }
 
     // Creamos el contrato para la cola
@@ -170,6 +190,21 @@ function stop(msg, colaServidor) {
     }
     colaServidor.canciones = [];
     colaServidor.conexion.player.dispatcher.end();
+}
+
+// Funcion para ver la cola de canciones
+function verCola(msg, colaServidor) {
+    n = 0;
+    if (colaServidor) {
+        msg.channel.send(`**Cola de Canciones**\n----------------------\n`);
+        while (n < colaServidor.canciones.length) {
+            msg.channel.send(`**#${n} - ${colaServidor.canciones[n].titulo}**\n`);
+            n++;
+        }
+        return;
+    } else {
+        msg.channel.send(`**La cola de canciones está vacia!**`);
+    }
 }
 
 cliente.login(token);
