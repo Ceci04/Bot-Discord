@@ -6,7 +6,7 @@ Bot que te permitirá realizar acciones como poner música, saltar la canción o
 
 Para poner en marcha el bot en tu equipo local y realizar pruebas o utilizarlo en tu servidor de discord necesitarás instalar estas dependencias antes de ejecutarlo por primera vez.
 
-`npm install discord.js@^12.5.3 ffmpeg fluent-ffmpeg ffmpeg-static @discordjs/opus ytdl-core --save`
+`npm install discord.js ffmpeg fluent-ffmpeg ffmpeg-static @discordjs/opus ytdl-core --save`
 
 Además de estas dependencias tendrás que tener en tu servidor una versión de **NodeJS**.
 
